@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插件生成器</title>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a8a5e6;
+            --accent-color: #00b894;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        .custom-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .custom-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .function-block {
+            background: #f8f9fa;
+            border: 2px dashed var(--secondary-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .character-setting {
+            min-height: 150px;
+            white-space: pre-wrap;
+        }
+
+        .upload-area label:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-container">
+        <div class="custom-card p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h1 class="text-center mb-0 display-4 fw-bold" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    🎁 插件生成器
+                </h1>
+                <div class="upload-area">
+                    <input type="file" id="jsonUpload" accept=".json" hidden>
+                    <label for="jsonUpload" class="btn btn-outline-primary">
+                        <i class="fas fa-upload me-2"></i>导入JSON
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="addonName" class="form-label fw-bold">插件名称</label>
+                <input type="text" class="form-control form-control-lg" id="addonName" placeholder="我的插件">
+            </div>
+
+            <div class="mb-4">
+                <label for="addonDescription" class="form-label fw-bold">插件描述</label>
+                <textarea class="form-control" id="addonDescription" rows="3" placeholder="这个插件的功能是..."></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="addonIcon" class="form-label fw-bold">插件图标 URL</label>
+                <input type="url" class="form-control" id="addonIcon" placeholder="https://example.com/icon.png">
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="h4 fw-bold mb-0">📦 功能列表</h2>
+                <button class="btn btn-primary btn-sm" onclick="addFunction()">
+                    <i class="fas fa-plus me-2"></i>添加功能
+                </button>
+            </div>
+
+            <div id="functions" class="functions-container"></div>
+
+            <div class="d-grid mt-5">
+                <button class="btn btn-success btn-lg py-3 fw-bold" onclick="generateAddon()">
+                    <i class="fas fa-rocket me-2"></i>生成插件文件
+                </button>
+            </div>
+        </div>
+
+        <footer class="mt-4 pt-4 border-top">
+            <div class="row justify-content-between">
+                <div class="col-md-8">
+                    <p class="text-muted small">
+                        由 <a href="https://youmu.ltd" class="text-decoration-none">MTR</a> 开发 •
+                        感谢 <a href="https://github.com/Love-Kogasa" class="text-decoration-none">Love-Kogasa</a> •
+                        GitHub Copilot 辅助开发
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="text-muted small">
+                        托管于 <a href="https://pages.cloudflare.com/" class="text-decoration-none">Cloudflare Pages</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <template id="functionTemplate">
+        <div class="function-block position-relative">
+            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="removeFunction(this)">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">功能名称</label>
+                <input type="text" class="form-control" name="functionName" required 
+                       placeholder="功能英文标识（例如：f1，切勿重复！）">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">功能类型</label>
+                <select class="form-select" name="functionType" onchange="showFunctionDataFields(this)" required>
+                    <option value="">请选择类型</option>
+                    <option value="new_gift">新礼物</option>
+                    <option value="new_character">覆盖角色设定</option>
+                    <option value="add_character">追加角色设定</option>
+                </select>
+            </div>
+
+            <div class="function-data-fields"></div>
+        </div>
+    </template>
+
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/popper.js/2.11.2/cjs/popper.min.js"></script>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/js/all.min.js" type="application/javascript"></script>
+    <script>
+        // 功能管理
+        function addFunction() {
+            const template = document.getElementById('functionTemplate');
+            const clone = template.content.cloneNode(true);
+            document.getElementById('functions').appendChild(clone);
+        }
+
+        function removeFunction(btn) {
+            btn.closest('.function-block').remove();
+        }
+
+        // 动态显示字段
+        function showFunctionDataFields(select) {
+            const container = select.closest('.function-block').querySelector('.function-data-fields');
+            container.innerHTML = '';
+
+            const type = select.value;
+            let html = '';
+
+            if (type === 'new_gift') {
+                html = `
+                    <div class="mb-3">
+                        <label class="form-label">礼物名称</label>
+                        <input type="text" class="form-control" name="giftName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">礼物描述</label>
+                        <textarea class="form-control" name="giftDescription" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">图标URL</label>
+                        <input type="url" class="form-control" name="giftIcon" required>
+                    </div>
+                `;
+            } else if (type === 'new_character' || type === 'add_character') {
+                html = `
+                    <div class="mb-3">
+                        <label class="form-label">角色名称</label>
+                        <input type="text" class="form-control" name="characterName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">详细设定</label>
+                        <textarea 
+                            class="form-control character-setting" 
+                            name="characterSetting" 
+                            rows="6"
+                            placeholder="请输入完整的角色设定描述（支持多行文本）\n示例：\n博丽灵梦\n\n东方Project核心角色，ZUN创作。\n博丽神社巫女，维护幻想乡结界。\n红白露腋装，持御币阴阳玉。\n天然乐观，飞行符卡攻击，“梦想天生”绝技。\n象征自由幻想，系列人气最高形象。"
+                            required></textarea>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // JSON导入功能
+        document.getElementById('jsonUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    loadJsonData(jsonData);
+                } catch (error) {
+                    alert('文件解析失败: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function loadJsonData(data) {
+            // 清空现有数据
+            document.getElementById('addonName').value = data.header?.name || '';
+            document.getElementById('addonDescription').value = data.header?.description || '';
+            document.getElementById('addonIcon').value = data.header?.icon || '';
+            document.getElementById('functions').innerHTML = '';
+
+            // 加载功能模块
+            for (const [funcName, funcData] of Object.entries(data)) {
+                if (funcName === 'header' || funcName === 'main') continue;
+
+                const functionType = Object.keys(funcData)[0];
+                const functionConfig = funcData[functionType];
+                
+                addFunction();
+                const currentBlock = document.getElementById('functions').lastElementChild;
+
+                // 填充基础信息
+                currentBlock.querySelector('[name="functionName"]').value = funcName;
+                currentBlock.querySelector('[name="functionType"]').value = functionType;
+                
+                // 触发类型变更
+                const select = currentBlock.querySelector('[name="functionType"]');
+                select.dispatchEvent(new Event('change'));
+                
+                // 填充详细数据
+                if (functionType === 'new_gift') {
+                    currentBlock.querySelector('[name="giftName"]').value = functionConfig.name;
+                    currentBlock.querySelector('[name="giftDescription"]').value = functionConfig.description;
+                    currentBlock.querySelector('[name="giftIcon"]').value = functionConfig.icon;
+                } else if (functionType === 'new_character' || functionType === 'add_character') {
+                    currentBlock.querySelector('[name="characterName"]').value = functionConfig.name;
+                    currentBlock.querySelector('[name="characterSetting"]').value = 
+                        typeof functionConfig.character === 'string' ? 
+                        functionConfig.character :
+                        JSON.stringify(functionConfig.character, null, 2);
+                }
+            }
+        }
+
+        // 生成插件文件
+        function generateAddon() {
+            const addon = {
+                "header": {
+                    "name": document.getElementById('addonName').value,
+                    "description": document.getElementById('addonDescription').value,
+                    "icon": document.getElementById('addonIcon').value
+                },
+                "main": {}
+            };
+
+            document.querySelectorAll('.function-block').forEach(funcBlock => {
+                const functionName = funcBlock.querySelector('[name="functionName"]').value;
+                const functionType = funcBlock.querySelector('[name="functionType"]').value;
+                const functionData = {};
+
+                if (functionType === 'new_gift') {
+                    functionData.name = funcBlock.querySelector('[name="giftName"]').value;
+                    functionData.description = funcBlock.querySelector('[name="giftDescription"]').value;
+                    functionData.icon = funcBlock.querySelector('[name="giftIcon"]').value;
+                } else if (functionType === 'new_character' || functionType === 'add_character') {
+                    functionData.name = funcBlock.querySelector('[name="characterName"]').value;
+                    functionData.character = funcBlock.querySelector('[name="characterSetting"]').value;
+                }
+
+                addon[functionName] = { [functionType]: functionData };
+                addon.main[functionName] = {};
+            });
+
+            downloadAddon(addon);
+        }
+
+        // 文件下载
+        function downloadAddon(addon) {
+            const json = JSON.stringify(addon, null, 2);
+            const blob = new Blob([json], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `addon_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
