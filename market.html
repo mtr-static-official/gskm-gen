@@ -103,14 +103,14 @@
 
         /* 模态框全屏 */
         .modal-dialog {
-            margin: 0;
-            min-height: 100vh;
+            margin: 1.75rem auto; /* 恢复默认外边距 */
+            max-width: 96%; /* 添加最大宽度限制 */
         }
 
         .modal-content {
-            border-radius: 0;
-            min-height: 100vh;
+            border-radius: 0.5rem; /* 恢复圆角 */
         }
+
 
         /* 按钮组垂直排列 */
         .btn-group > .btn {
@@ -176,7 +176,189 @@
             max-width: 50%;
         }
     }
+    @media (max-width: 767.98px) {
+    .mobile-input-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .search-input {
+        width: 100% !important;
+        border-radius: 8px !important;
+        padding: 12px 16px;
+        font-size: 16px; /* 优化移动端输入字号 */
+    }
+
+    .search-btn {
+        width: 100%;
+        border-radius: 8px !important;
+        padding: 14px;
+        font-size: 16px;
+        order: 2; /* 确保按钮在输入框下方 */
+    }
+
+    /* 修复iOS输入框缩放问题 */
+    @supports (-webkit-overflow-scrolling: touch) {
+        input[type="number"] {
+            font-size: 16px;
+            transform: scale(0.98);
+        }
+    }
+}
+@media (max-width: 767.98px) {
+    /* 模态框自适应调整 */
+    .modal-dialog {
+        width: auto;
+        margin: 10px;
+    }
+    
+    .modal-content {
+        min-height: auto; /* 移除强制高度 */
+    }
+    
+    /* 输入框优化 */
+    .search-input {
+        width: 100% !important;
+        max-width: 100%;
+        padding: 12px;
+    }
+    
+    /* 按钮优化 */
+    .search-btn {
+        width: auto;
+        min-width: 100px;
+        padding: 12px 20px;
+    }
+}
+
+/* 内容自适应模态框 */
+.auto-size-modal .modal-dialog {
+    width: auto;
+    max-width: 600px; /* 设置最大限制 */
+    margin: 20px auto;
+}
+
+/* 表单元素优化 */
+.modal-body textarea {
+    min-height: 200px; /* 合理的最小高度 */
+    max-height: 70vh; /* 设置最大高度 */
+    overflow-y: auto;
+    resize: vertical; /* 允许垂直调整 */
+}
+
+/* 页脚按钮优化 */
+.modal-footer {
+    flex-wrap: nowrap; /* 防止按钮换行 */
+    gap: 10px;
+}
+
+/* 输入框组优化 */
+.input-group {
+    max-width: 500px; /* 限制最大宽度 */
+    margin: 0 auto;
+}
 </style>
+<style>
+    /* 页脚优化样式 */
+    .market-footer {
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 2px solid #ff4d4d;
+        box-shadow: 0 -4px 12px rgba(255, 77, 77, 0.1);
+        margin-top: 3rem;
+        padding: 2rem 0;
+    }
+    
+    .disclaimer-box {
+        background: #fff5f5;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        border: 1px solid #ffcccc;
+        position: relative;
+    }
+    
+    .disclaimer-box i {
+        position: absolute;
+        left: 1rem;
+        top: -0.8rem;
+        font-size: 1.5rem;
+        background: white;
+        padding: 0 0.25rem;
+    }
+    
+    .disclaimer-text {
+        color: #cc3333;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin: 0;
+        text-align: center;
+    }
+    
+    .credit-box {
+        display: grid;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .credit-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed #eee;
+    }
+    
+    .credit-item:last-child {
+        border-bottom: none;
+    }
+    
+    .credit-label {
+        color: #ff4d4d;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .credit-item a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .credit-item a:hover {
+        color: #ff4d4d;
+    }
+    
+    .badge {
+        font-weight: normal;
+        margin: 0 3px;
+        vertical-align: baseline;
+    }
+    
+    .bg-vercel {
+        background: linear-gradient(45deg, #000, #444);
+    }
+    
+    .bg-bootstrap {
+        background: linear-gradient(45deg, #7952b3, #563d7c);
+    }
+    
+    @media (max-width: 767.98px) {
+        .market-footer {
+            padding: 1.5rem 0;
+        }
+        
+        .disclaimer-text {
+            font-size: 0.8rem;
+            text-align: left;
+            padding-left: 1.5rem;
+        }
+        
+        .credit-box {
+            gap: 1rem;
+        }
+        
+        .credit-item {
+            font-size: 0.9rem;
+        }
+    }
+    </style>
        <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
@@ -248,18 +430,19 @@
         <!-- 加载状态 -->
 
         <div class="row mb-3">
-            <div class="col-md-4">
-                <div class="input-group">
+            <div class="col-12">
+                <div class="input-group mobile-input-group">
                     <input type="number" id="searchId" 
-                           class="form-control" 
+                           class="form-control search-input"
                            placeholder="输入插件ID"
                            min="1">
-                    <button class="btn btn-primary" id="searchById">
+                    <button class="btn btn-primary search-btn" id="searchById">
                         <i class="bi bi-search"></i> 搜索
                     </button>
                 </div>
             </div>
         </div>
+        
         <div id="loading" class="text-center">
             <div class="spinner-border text-primary" role="status"></div>
             <p class="mt-2">正在加载插件...</p>
@@ -889,11 +1072,36 @@
     }
     </script>
 <!-- 添加Footer -->
-<footer class="text-center mt-5 py-4" style="background: rgba(255, 255, 255, 0.8); border-top: 1px solid #ff4d4d; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
+<footer class="market-footer">
     <div class="container">
-        <p style="margin: 0; padding: 0.5rem 0;">开发者: <a href="https://youmu.ltd" target="_blank" style="color: #ff4d4d; text-decoration: none;">MTR (youmu.ltd)</a></p>
-        <p style="margin: 0; padding: 0.5rem 0;">原始项目: <a href="https://gskmail.thmobile.xyz/" target="_blank" style="color: #ff4d4d; text-decoration: none;">☯ Gensokyo Mail</a> 及其作者 <a href="https://github.com/Love-Kogasa" target="_blank" style="color: #ff4d4d; text-decoration: none;">Love-Kogasa</a></p>
-        <p style="margin: 0; padding: 0.5rem 0;">部署于 <a href="https://vercel.com/" target="_blank" style="color: #ff4d4d; text-decoration: none;">Vercel</a></p>
+        <div class="footer-content">
+            <div class="disclaimer-box">
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                <p class="disclaimer-text">
+                    Addon的标题与描述由用户提交，与本站立场无关。
+
+                    请勿过度解读或用于非游戏场景。
+                </p>
+            </div>
+            
+            <div class="credit-box">
+                <div class="credit-item">
+                    <span class="credit-label">开发者：</span>
+                    <a href="https://youmu.ltd" target="_blank">MTR</a>
+                </div>
+                <div class="credit-item">
+                    <span class="credit-label">灵感来源：</span>
+                    <a href="https://gskmail.thmobile.xyz/" target="_blank">☯ Gensokyo Mail</a>
+                </div>
+                <div class="credit-item">
+                    <span class="credit-label">技术支持：</span>
+                    <span class="tech-stack">
+                        <span class="badge bg-vercel">Vercel</span>
+                        <span class="badge bg-bootstrap">Bootstrap 5</span>
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
     </body>
