@@ -359,6 +359,37 @@
         }
     }
     </style>
+    <style>
+/* 修改现有toast样式 */
+.toast-container {
+    z-index: 99999 !important; /* 确保最高层级 */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+/* 强制提升toast层级 */
+.toast {
+    position: relative;
+    z-index: 999999 !important; /* 双重保险 */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 767.98px) {
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+    
+    .toast {
+        width: 100% !important;
+        max-width: 100%;
+    }
+}
+</style>
        <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
