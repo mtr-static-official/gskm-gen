@@ -741,7 +741,7 @@
                     </span>
                     <p class="card-text mt-2">${escapeHTML(addon.description)}</p>
                     <small class="text-muted">插件ID: ${addon.id}</small>
-                    ${isPassed ? `
+                    ${(isPassed || isAdminMode) ? `
                     <div class="mt-3">
                         <button class="btn btn-sm btn-primary download-btn" 
                         data-content="${encodeURIComponent(addon.content)}"
@@ -886,87 +886,104 @@
 }
 
 // 新增显示单个插件的模态框
-    function showSingleAddon(addon) {
-        const isPassed = addon.passed;
-        
-        // 创建模态框HTML
-        const modalHtml = `
-        <div class="modal fade" id="addonModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${escapeHTML(addon.name)}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>描述：</strong>${escapeHTML(addon.description)}</p>
-                                <p><strong>状态：</strong>
-                                    <span class="badge ${isPassed ? 'bg-success' : 'bg-warning'}">
-                                        ${isPassed ? '已审核' : '待审核'}
-                                    </span>
-                                </p>
-                                <p><strong>插件ID：</strong>${addon.id}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">配置信息</div>
-                                    <div class="card-body bg-light">
-                                        ${isPassed ? 
-                                            `<pre>${escapeHTML(JSON.stringify(parseEscapedJSON(addon.content), null, 2))}</pre>` :
-                                            `<div class="alert alert-warning m-0">
-                                                <i class="bi bi-shield-lock"></i>
-                                                该插件尚未通过安全审核，无法查看配置详情
-                                            </div>`
-                                        }
+// 新增显示单个插件的模态框
+        function showSingleAddon(addon) {
+            const isPassed = addon.passed;
+            
+            // 创建模态框HTML
+            const modalHtml = `
+            <div class="modal fade" id="addonModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">${escapeHTML(addon.name)}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>描述：</strong>${escapeHTML(addon.description)}</p>
+                                    <p><strong>状态：</strong>
+                                        <span class="badge ${isPassed ? 'bg-success' : 'bg-warning'}">
+                                            ${isPassed ? '已审核' : '待审核'}
+                                        </span>
+                                    </p>
+                                    <p><strong>插件ID：</strong>${addon.id}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">配置信息</div>
+                                        <div class="card-body bg-light">
+                                            ${(isAdminMode || isPassed) ? 
+                                                `<pre>${escapeHTML(JSON.stringify(parseEscapedJSON(addon.content), null, 2))}</pre>` :
+                                                `<div class="alert alert-warning m-0">
+                                                    <i class="bi bi-shield-lock"></i>
+                                                    该插件尚未通过安全审核，无法查看配置详情
+                                                </div>`
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        ${isPassed ? `
-                        <button class="btn btn-primary download-btn" 
-                            data-content="${encodeURIComponent(addon.content)}"
-                            data-filename="${encodeURIComponent(addon.name)}">
-                            <i class="bi bi-download"></i> 下载配置
-                        </button>
-                        ` : ''}
-                        <button type="button" class="btn btn-danger delete-btn" data-id="${addon.id}">
-                            <i class="bi bi-trash"></i> 删除插件
-                        </button>
-                        ${isAdminMode ? `
-                        <button type="button" class="btn btn-warning modify-btn" data-id="${addon.id}">
-                            <i class="bi bi-pencil-square"></i> 修改插件
-                        </button>
-                        ` : ''}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <div class="modal-footer">
+                            ${isAdminMode ? `
+                            <div class="btn-group me-auto">
+                                ${addon.passed ? 
+                                    `<button type="button" class="btn btn-danger reject-btn" data-id="${addon.id}">
+                                        <i class="bi bi-x-circle"></i> 取消审核
+                                    </button>` : 
+                                    `<button type="button" class="btn btn-success approve-btn" data-id="${addon.id}">
+                                        <i class="bi bi-check-circle"></i> 通过审核
+                                    </button>`
+                                }
+                            </div>
+                            ` : ''}
+                            
+                            ${(isAdminMode || isPassed) ? `
+                            <button class="btn btn-primary download-btn" 
+                                data-content="${encodeURIComponent(addon.content)}"
+                                data-filename="${encodeURIComponent(addon.name)}">
+                                <i class="bi bi-download"></i> 下载
+                            </button>
+                            ` : ''}
+                            
+                            ${isAdminMode ? `
+                            <button type="button" class="btn btn-danger delete-btn" data-id="${addon.id}">
+                                <i class="bi bi-trash"></i> 删除
+                            </button>
+                            <button type="button" class="btn btn-warning modify-btn" data-id="${addon.id}">
+                                <i class="bi bi-pencil-square"></i> 修改
+                            </button>
+                            ` : ''}
+                            
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
 
-        // 插入到DOM
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
-        // 初始化并显示模态框
-        const modalElement = document.getElementById('addonModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+            // 插入到DOM
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // 初始化并显示模态框
+            const modalElement = document.getElementById('addonModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
 
-        // 清理逻辑
-        modalElement.addEventListener('hidden.bs.modal', () => {
-            modal.dispose();
-            modalElement.remove();
-        });
+            // 清理逻辑
+            modalElement.addEventListener('hidden.bs.modal', () => {
+                modal.dispose();
+                modalElement.remove();
+            });
 
-        // 绑定下载事件（复用之前的处理逻辑）
-        modalElement.querySelector('.download-btn')?.addEventListener('click', handleDownloadClick);
-        modalElement.querySelector('.delete-btn')?.addEventListener('click', () => handleDelete(addon.id));
-        modalElement.querySelector('.modify-btn')?.addEventListener('click', () => handleModify(addon.id));
-    }
-
+            // 绑定事件
+            modalElement.querySelector('.download-btn')?.addEventListener('click', handleDownloadClick);
+            modalElement.querySelector('.delete-btn')?.addEventListener('click', () => handleDelete(addon.id));
+            modalElement.querySelector('.modify-btn')?.addEventListener('click', () => handleModify(addon.id));
+            modalElement.querySelector('.approve-btn')?.addEventListener('click', () => handleApprove(addon.id));
+            modalElement.querySelector('.reject-btn')?.addEventListener('click', () => handleReject(addon.id));
+        }
     // 审核通过处理
     async function handleApprove(id) {
         try {
