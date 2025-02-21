@@ -32,17 +32,7 @@
             position: relative;
             overflow: hidden;
         }
-    
-        .custom-card::before {
-            content: '⚪';
-            position: absolute;
-            font-size: 8rem;
-            opacity: 0.1;
-            right: -2rem;
-            top: -2rem;
-            transform: rotate(45deg);
-            color: var(--primary-color);
-        }
+
     
         .function-block {
             background: #fff;
@@ -173,6 +163,12 @@
                 <button class="btn btn-success btn-lg py-3 fw-bold" onclick="generateAddon()">
                     <i class="fas fa-rocket me-2"></i>生成插件文件
                 </button>
+            </div>
+
+            <div class="d-grid mt-3">
+                <a href="/market.html" class="btn btn-primary btn-lg py-3 fw-bold">
+                    <i class="fas fa-shop me-2"></i>可将您的作品上传至Addon Market
+                </a>
             </div>
         </div>
 
