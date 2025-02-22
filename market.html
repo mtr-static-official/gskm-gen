@@ -5,6 +5,7 @@
     <title>插件市场</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <!-- Bootstrap 5 -->
+    <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/all.min.css" type="text/css" rel="stylesheet" />
     <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -392,11 +393,14 @@
 </style>
        <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
+
+
+
 <body>
     <nav class="navbar">
         <div class="container-fluid">
           <button class="btn btn-sm btn-outline-secondary ms-auto" id="adminToggle">
-            <i class="bi bi-shield-lock"></i> 开启管理员模式
+            <i class="fas fa-shield"></i> 开启管理员模式
           </button>
         </div>
     </nav>
@@ -450,10 +454,10 @@
             </div>
             <div class="col-md-4 text-end">
                 <button class="btn btn-secondary me-2" id="manualRefresh">
-                    <i class="bi bi-arrow-clockwise"></i> 手动刷新
+                    <i class="fas fa-arrows-rotate"></i> 手动刷新
                 </button>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#submitAddonModal">
-                    <i class="bi bi-plus-circle"></i> 提交新插件
+                    <i class="fas fa-plus"></i> 提交新插件
                 </button>
             </div>
         </div>
@@ -468,7 +472,7 @@
                            placeholder="输入插件ID"
                            min="1">
                     <button class="btn btn-primary search-btn" id="searchById">
-                        <i class="bi bi-search"></i> 搜索
+                        <i class="fas fa-search"></i> <b>搜索</b>
                     </button>
                 </div>
             </div>
@@ -512,8 +516,8 @@
             if (!adminBtn) return;
 
             adminBtn.innerHTML = isAdminMode ? 
-                `<i class="bi bi-shield-check"></i> 管理员模式已启用` :
-                `<i class="bi bi-shield-lock"></i> 开启管理员模式`;
+                `<i class="fas fa-shield"></i> 管理员模式已启用` :
+                `<i class="fas fa-lock"></i> 开启管理员模式`;
 
             adminBtn.classList.toggle('btn-outline-success', isAdminMode);
             adminBtn.classList.toggle('btn-outline-secondary', !isAdminMode);
@@ -715,61 +719,90 @@
     
         // 渲染插件列表
         function renderAddons(addons) {
-        const listContainer = document.getElementById('addons-list');
-        listContainer.innerHTML = addons.map(addon => {
-            const isPassed = addon.passed;
-            const adminControls = isAdminMode ? `
-            <div class="mt-2">
-                ${isPassed ? 
-                `<button class="btn btn-sm btn-danger reject-btn" data-id="${addon.id}">
-                    <i class="bi bi-x-circle"></i> 取消通过
-                </button>` : 
-                `<button class="btn btn-sm btn-success approve-btn" data-id="${addon.id}">
-                    <i class="bi bi-check-circle"></i> 通过审核
-                </button>`
-                }
-            </div>
-            ` : '';
+            const listContainer = document.getElementById('addons-list');
+            listContainer.innerHTML = addons.map(addon => {
+                const isPassed = addon.passed;
+                const adminControls = isAdminMode ? `
+                <div class="mt-2">
+                    ${isPassed ? 
+                    `<button class="btn btn-sm btn-danger reject-btn" data-id="${addon.id}">
+                        <i class="fas fa-xmark"></i> 取消通过
+                    </button>` : 
+                    `<button class="btn btn-sm btn-success approve-btn" data-id="${addon.id}">
+                        <i class="fas fa-square-check"></i> 通过审核
+                    </button>`
+                    }
+                </div>
+                ` : '';
 
-            return `
-            <div class="col">
-                <div class="card addon-card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">${escapeHTML(addon.name)}</h5>
-                    <span class="badge ${isPassed ? 'bg-success' : 'bg-warning'}">
-                    ${isPassed ? '已审核' : '待审核'}
-                    </span>
-                    <p class="card-text mt-2">${escapeHTML(addon.description)}</p>
-                    <small class="text-muted">插件ID: ${addon.id}</small>
-                    ${(isPassed || isAdminMode) ? `
-                    <div class="mt-3">
-                        <button class="btn btn-sm btn-primary download-btn" 
-                        data-content="${encodeURIComponent(addon.content)}"
-                        data-filename="${encodeURIComponent(addon.name)}">
-                        下载配置
-                        </button>
+                return `
+                <div class="col">
+                    <div class="card addon-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">${escapeHTML(addon.name)}</h5>
+                        <span class="badge ${isPassed ? 'bg-success' : 'bg-warning'}">
+                        ${isPassed ? '已审核' : '待审核'}
+                        </span>
+                        <p class="card-text mt-2">${escapeHTML(addon.description)}</p>
+                        <small class="text-muted">插件ID: ${addon.id}</small>
+                        ${(isPassed || isAdminMode) ? `
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary download-btn" 
+                            data-content="${encodeURIComponent(addon.content)}"
+                            data-filename="${encodeURIComponent(addon.name)}">
+                            <i class="fas fa-download"></i>下载配置
+                            </button>
+                        </div>
+                        ` : ''}
+                        ${adminControls}
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-info view-addon-btn" data-id="${addon.id}">
+                                <i class="fas fa-circle-info"></i>查看详情
+                            </button>
+                        </div>
                     </div>
-                    ` : ''}
-                    ${adminControls}
+                    </div>
                 </div>
-                </div>
-            </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
 
-        // 绑定新按钮事件
-        document.querySelectorAll('.approve-btn').forEach(btn => {
-            btn.addEventListener('click', () => handleApprove(btn.dataset.id));
-        });
-        document.querySelectorAll('.reject-btn').forEach(btn => {
-            btn.addEventListener('click', () => handleReject(btn.dataset.id));
-        });
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', () => handleDelete(btn.dataset.id));
-        });
-        document.querySelectorAll('.modify-btn').forEach(btn => {
-            btn.addEventListener('click', () => handleModify(btn.dataset.id));
-        });
+            // 绑定新按钮事件
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleApprove(btn.dataset.id));
+            });
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleReject(btn.dataset.id));
+            });
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleDelete(btn.dataset.id));
+            });
+            document.querySelectorAll('.modify-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleModify(btn.dataset.id));
+            });
+            document.querySelectorAll('.view-addon-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = parseInt(btn.dataset.id);
+                    // 从缓存中查找插件
+                    const addon = allAddonsCache?.find(a => a.id === id);
+                    
+                    if (addon) {
+                        showSingleAddon(addon);
+                    } else {
+                        try {
+                            // 如果缓存中没有，则从API获取
+                            const response = await fetch(`https://api.youmu.ltd/fetch/${id}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                showSingleAddon(data);
+                            } else {
+                                showNotification('插件不存在或已删除', 'warning');
+                            }
+                        } catch (error) {
+                            showNotification('获取插件详情失败', 'danger');
+                        }
+                    }
+                });
+            });
         }
     
         // 下载处理
@@ -917,7 +950,7 @@
                                             ${(isAdminMode || isPassed) ? 
                                                 `<pre>${escapeHTML(JSON.stringify(parseEscapedJSON(addon.content), null, 2))}</pre>` :
                                                 `<div class="alert alert-warning m-0">
-                                                    <i class="bi bi-shield-lock"></i>
+                                                    <i class="fas fa-shield"></i>
                                                     该插件尚未通过安全审核，无法查看配置详情
                                                 </div>`
                                             }
@@ -931,10 +964,10 @@
                             <div class="btn-group me-auto">
                                 ${addon.passed ? 
                                     `<button type="button" class="btn btn-danger reject-btn" data-id="${addon.id}">
-                                        <i class="bi bi-x-circle"></i> 取消审核
+                                        <i class="fas fa-ban"></i> 取消审核
                                     </button>` : 
                                     `<button type="button" class="btn btn-success approve-btn" data-id="${addon.id}">
-                                        <i class="bi bi-check-circle"></i> 通过审核
+                                        <i class="fas fa-circle-check"></i> 通过审核
                                     </button>`
                                 }
                             </div>
@@ -944,20 +977,20 @@
                             <button class="btn btn-primary download-btn" 
                                 data-content="${encodeURIComponent(addon.content)}"
                                 data-filename="${encodeURIComponent(addon.name)}">
-                                <i class="bi bi-download"></i> 下载
+                                <i class="fas fa-download"></i> 下载
                             </button>
                             ` : ''}
                             
                             ${isAdminMode ? `
                             <button type="button" class="btn btn-danger delete-btn" data-id="${addon.id}">
-                                <i class="bi bi-trash"></i> 删除
+                                <i class="fas fa-trash"></i> 删除
                             </button>
                             <button type="button" class="btn btn-warning modify-btn" data-id="${addon.id}">
-                                <i class="bi bi-pencil-square"></i> 修改
+                                <i class="fas fa-pencil-square"></i> 修改
                             </button>
                             ` : ''}
                             
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-xmark"></i>关闭</button>
                         </div>
                     </div>
                 </div>
@@ -1124,7 +1157,7 @@
     <div class="container">
         <div class="footer-content">
             <div class="disclaimer-box">
-                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                <i class="fas fa-triangle-exclamation text-danger"></i>
                 <p class="disclaimer-text">
                     Addon的标题与描述由用户提交，与本站立场无关。
 
