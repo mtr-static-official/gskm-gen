@@ -70,7 +70,19 @@ function setupEventListeners() {
 
     // 下载按钮委托
     document.addEventListener('click', handleDownloadClick);
-    document.getElementById('searchById').addEventListener('click', handleIdSearch);
+    document.getElementById('searchBtn').addEventListener('click', handleSearch);
+    document.getElementById('searchType').addEventListener('change', function() {
+        const searchInput = document.getElementById('searchId');
+        if (this.value === 'id') {
+            searchInput.type = 'number';
+            searchInput.placeholder = '输入插件ID';
+            searchInput.min = '1';
+        } else {
+            searchInput.type = 'text';
+            searchInput.placeholder = '输入关键词';
+            searchInput.removeAttribute('min');
+        }
+    });
     document.getElementById('adminToggle').addEventListener('click', () => {
     if (!isAdminMode) {
         new bootstrap.Modal('#adminModal').show();
@@ -649,3 +661,45 @@ toastEl.classList.add(`bg-${type}`);
 const toast = new bootstrap.Toast(toastEl);
 toast.show();
 }
+
+async function handleSearch() {
+    const searchType = document.getElementById('searchType').value;
+    const searchValue = document.getElementById('searchId').value.trim();
+    
+    if (!searchValue) {
+        showNotification('请输入搜索内容', 'warning');
+        return;
+    }
+
+    showLoading();
+    try {
+        if (searchType === 'id') {
+            await handleIdSearch();
+        } else {
+            await handleKeywordSearch(searchValue);
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+// 新增模糊搜索处理
+async function handleKeywordSearch(keyword) {
+    if (!allAddonsCache) {
+        await loadInitialData();
+    }
+    
+    const searchTerm = keyword.toLowerCase();
+    const results = allAddonsCache.filter(addon => {
+        return addon.name.toLowerCase().includes(searchTerm) || 
+               addon.description.toLowerCase().includes(searchTerm);
+    });
+
+    if (results.length === 0) {
+        showNotification('未找到匹配的插件', 'warning');
+        return;
+    }
+
+    renderAddons(results, searchTerm); // 传入搜索关键词用于高亮
+}
+

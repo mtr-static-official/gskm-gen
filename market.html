@@ -83,11 +83,15 @@
         <div class="row mb-3">
             <div class="col-12">
                 <div class="input-group mobile-input-group">
+                    <select class="form-select search-select" id="searchType" style="max-width: 120px;">
+                        <option value="id">ID搜索</option>
+                        <option value="keyword">模糊搜索</option>
+                    </select>
                     <input type="number" id="searchId" 
                            class="form-control search-input"
                            placeholder="输入插件ID"
                            min="1">
-                    <button class="btn btn-primary search-btn" id="searchById">
+                    <button class="btn btn-primary search-btn" id="searchBtn">
                         <i class="fas fa-search"></i> <b>搜索</b>
                     </button>
                 </div>
