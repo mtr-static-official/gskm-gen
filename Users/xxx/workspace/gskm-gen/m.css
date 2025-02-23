@@ -1,0 +1,38 @@
+@media (max-width: 767.98px) {
+    .search-select {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 0.5rem;
+        border-radius: 8px !important;
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .search-input {
+        width: 100% !important;
+        border-radius: 8px !important;
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .search-btn {
+        width: 100%;
+        border-radius: 8px !important;
+        padding: 14px;
+        font-size: 16px;
+        order: 2;
+    }
+    
+    .mobile-input-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+/* 修复iOS输入框缩放问题 */
+@supports (-webkit-overflow-scrolling: touch) {
+input[type="number"] {
+    font-size: 16px;
+    transform: scale(0.98);
+}
+}
+}

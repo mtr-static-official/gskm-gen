@@ -8,7 +8,7 @@
     <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/all.min.css" type="text/css" rel="stylesheet" />
     <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
        <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-       <link rel="stylesheet" href="/m.min.css">
+       <link rel="stylesheet" href="/m.css">
     </head>
 
 
@@ -83,17 +83,19 @@
         <div class="row mb-3">
             <div class="col-12">
                 <div class="input-group mobile-input-group">
-                    <select class="form-select search-select" id="searchType" style="max-width: 120px;">
-                        <option value="id">ID搜索</option>
-                        <option value="keyword">模糊搜索</option>
-                    </select>
-                    <input type="number" id="searchId" 
-                           class="form-control search-input"
-                           placeholder="输入插件ID"
-                           min="1">
-                    <button class="btn btn-primary search-btn" id="searchBtn">
-                        <i class="fas fa-search"></i> <b>搜索</b>
-                    </button>
+                    <div class="d-flex flex-nowrap w-100">
+                        <select class="form-select search-select flex-grow-0" id="searchType" style="min-width: 120px;">
+                            <option value="id">ID搜索</option>
+                            <option value="keyword">模糊搜索</option>
+                        </select>
+                        <input type="number" id="searchId" 
+                               class="form-control search-input flex-grow-1"
+                               placeholder="输入插件ID"
+                               min="1">
+                        <button class="btn btn-primary search-btn flex-grow-0" id="searchBtn">
+                            <i class="fas fa-search"></i> <span class="d-none d-sm-inline"><b>搜索</b></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +121,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <script src="/mapp.min.js"></script>
+    <script src="/mapp.js"></script>
 <!-- 添加Footer -->
 <footer class="market-footer">
     <div class="container">

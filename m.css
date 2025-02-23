@@ -168,25 +168,34 @@ footer {
 }
 }
 @media (max-width: 767.98px) {
-.mobile-input-group {
-flex-direction: column;
-gap: 12px;
-}
-
-.search-input {
-width: 100% !important;
-border-radius: 8px !important;
-padding: 12px 16px;
-font-size: 16px; /* 优化移动端输入字号 */
-}
-
-.search-btn {
-width: 100%;
-border-radius: 8px !important;
-padding: 14px;
-font-size: 16px;
-order: 2; /* 确保按钮在输入框下方 */
-}
+    .search-select {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 0.5rem;
+        border-radius: 8px !important;
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .search-input {
+        width: 100% !important;
+        border-radius: 8px !important;
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .search-btn {
+        width: 100%;
+        border-radius: 8px !important;
+        padding: 14px;
+        font-size: 16px;
+        order: 2;
+    }
+    
+    .mobile-input-group {
+        flex-direction: column;
+        gap: 12px;
+    }
 
 /* 修复iOS输入框缩放问题 */
 @supports (-webkit-overflow-scrolling: touch) {
@@ -381,4 +390,50 @@ margin: 0 auto;
     background-color: #ffd700;
     padding: 0 2px;
     border-radius: 3px;
+}
+
+@media (max-width: 767.98px) {
+    .search-select {
+        min-width: 110px !important;
+        max-width: 40% !important;
+        font-size: 14px;
+        padding: 10px 12px;
+        border-radius: 8px 0 0 8px !important;
+    }
+    
+    .search-input {
+        border-radius: 0 8px 8px 0 !important;
+        font-size: 14px;
+        min-width: 60px;
+    }
+    
+    .search-btn {
+        width: auto;
+        min-width: 60px;
+        padding: 10px 15px;
+        margin-left: 8px;
+        border-radius: 8px !important;
+    }
+    
+    .mobile-input-group .d-flex {
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+    
+    /* 针对超小屏幕优化 */
+    @media (max-width: 375px) {
+        .search-select {
+            min-width: 100px !important;
+            font-size: 13px;
+        }
+        
+        .search-input::placeholder {
+            font-size: 13px;
+        }
+        
+        .search-btn {
+            min-width: 50px;
+            padding: 8px 12px;
+        }
+    }
 }

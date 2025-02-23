@@ -96,17 +96,51 @@ function setupEventListeners() {
         showNotification('已退出管理员模式', 'info');
     }
     });
-    document.getElementById('saveSecretKey').addEventListener('click', () => {
-    const key = document.getElementById('secretKeyInput').value.trim();
-    if (key) {
-        apiKey = key;
-        localStorage.setItem('addon-market-api-key', key);
-        isAdminMode = true;
-        updateAdminUI();
-        bootstrap.Modal.getInstance('#adminModal').hide();
-        applyCurrentFilter(); // 刷新列表
-        showNotification('Secret Key已保存', 'success');
-    }
+    document.getElementById('saveSecretKey').addEventListener('click', async () => {
+        const key = document.getElementById('secretKeyInput').value.trim();
+        if (!key) return;
+    
+        try {
+            // 显示验证状态
+            const saveBtn = document.getElementById('saveSecretKey');
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 验证中...';
+            saveBtn.disabled = true;
+    
+            // 使用id=1的插件进行验证
+            const response = await fetch(`https://api.youmu.ltd/pass/1`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': key
+                }
+            });
+    
+            const result = await response.json();
+            
+            if (result.id === 0) {
+                // 验证成功
+                apiKey = key;
+                localStorage.setItem('addon-market-api-key', key);
+                isAdminMode = true;
+                updateAdminUI();
+                bootstrap.Modal.getInstance('#adminModal').hide();
+                applyCurrentFilter();
+                showNotification('Secret Key验证成功', 'success');
+            } else if (result.id === 100) {
+                showNotification('无效的Secret Key', 'danger');
+                document.getElementById('secretKeyInput').value = '';
+            } else {
+                showNotification('验证服务不可用，请稍后重试', 'warning');
+            }
+        } catch (error) {
+            console.error('验证失败:', error);
+            showNotification('验证过程中发生错误', 'danger');
+        } finally {
+            // 重置按钮状态
+            const saveBtn = document.getElementById('saveSecretKey');
+            saveBtn.innerHTML = '保存';
+            saveBtn.disabled = false;
+        }
     });
 
     // 手动刷新按钮
@@ -665,14 +699,16 @@ toast.show();
 async function handleSearch() {
     const searchType = document.getElementById('searchType').value;
     const searchValue = document.getElementById('searchId').value.trim();
-    
-    if (!searchValue) {
-        showNotification('请输入搜索内容', 'warning');
-        return;
-    }
 
     showLoading();
     try {
+        // 当搜索内容为空时显示全部插件
+        if (!searchValue) {
+            currentFilter = 'all';
+            await applyCurrentFilter();
+            return;
+        }
+
         if (searchType === 'id') {
             await handleIdSearch();
         } else {
@@ -682,7 +718,6 @@ async function handleSearch() {
         hideLoading();
     }
 }
-
 // 新增模糊搜索处理
 async function handleKeywordSearch(keyword) {
     if (!allAddonsCache) {
