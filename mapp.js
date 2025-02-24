@@ -560,6 +560,29 @@ function showSingleAddon(addon) {
     modalElement.querySelector('.modify-btn')?.addEventListener('click', () => handleModify(addon.id));
     modalElement.querySelector('.approve-btn')?.addEventListener('click', () => handleApprove(addon.id));
     modalElement.querySelector('.reject-btn')?.addEventListener('click', () => handleReject(addon.id));
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modal.dispose();
+        modalElement.remove();
+        applyCurrentFilter(); // 新增：关闭时刷新列表
+    });
+
+
+
+    // 绑定修改按钮点击事件
+    modalElement.querySelector('.modify-btn')?.addEventListener('click', async () => {
+        // 使用更可靠的关闭方式
+        const currentModal = bootstrap.Modal.getInstance(modalElement);
+        if (currentModal) {
+            currentModal.hide();
+            currentModal.dispose();
+        }
+        modalElement.remove();
+        
+        // 再打开修改模态框
+        await handleModify(addon.id);
+    });
+
+
 }
 // 审核通过处理
 async function handleApprove(id) {
@@ -648,40 +671,116 @@ try {
 
 // 修改插件处理
 async function handleModify(id) {
-const newContent = prompt('请输入新的插件 JSON 内容:');
-if (!newContent) {
-    showNotification('插件 JSON 内容不能为空', 'warning');
-    return;
-}
+    try {
+        // 获取当前插件数据
+        const response = await fetch(`https://api.youmu.ltd/fetch/${id}`);
+        if (!response.ok) throw new Error('获取插件数据失败');
+        
+        const addon = await response.json();
+        const parsedContent = parseEscapedJSON(addon.content);
+        
+        // 填充模态框
+        const textarea = document.getElementById('modifyJsonInput');
+        textarea.value = JSON.stringify(parsedContent, null, 2);
+        textarea.dataset.id = id;
 
-try {
-    JSON.parse(newContent); // 验证 JSON 格式
-} catch (error) {
-    showNotification('无效的 JSON 格式', 'danger');
-    return;
-}
+        // 显示修改模态框
+        const modifyModal = new bootstrap.Modal('#modifyAddonModal');
+        modifyModal.show();
 
-try {
-    const response = await fetch(`https://api.youmu.ltd/modify/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-API-Key': apiKey
-        },
-        body: new URLSearchParams({ string: newContent })
-    });
+        // 监听修改模态框的隐藏事件
+        document.getElementById('modifyAddonModal').addEventListener('hidden.bs.modal', async () => {
+            // 修改完成后重新打开详情模态框
+            const updatedResponse = await fetch(`https://api.youmu.ltd/fetch/${id}`);
+            if (updatedResponse.ok) {
+                const updatedAddon = await updatedResponse.json();
+                showSingleAddon(updatedAddon);
+            }
+        }, {once: true}); // 使用once选项确保只执行一次
 
-    if (response.ok) {
-        showNotification('插件修改成功', 'success');
-        await applyCurrentFilter(); // 刷新列表
-    } else {
-        showNotification('插件修改失败', 'danger');
+    } catch (error) {
+        console.error('修改准备失败:', error);
+        showNotification('获取插件数据失败', 'danger');
     }
-} catch (error) {
-    console.error('插件修改失败:', error);
-    showNotification('插件修改失败，请重试', 'danger');
 }
-}
+
+// 添加保存修改的事件监听
+document.getElementById('saveModifiedAddon').addEventListener('click', async () => {
+    const textarea = document.getElementById('modifyJsonInput');
+    const newContent = textarea.value.trim();
+    const id = textarea.dataset.id;
+
+    if (!newContent) {
+        showNotification('插件 JSON 内容不能为空', 'warning');
+        return;
+    }
+
+    try {
+        JSON.parse(newContent); // 验证JSON格式
+    } catch (error) {
+        showNotification('无效的 JSON 格式', 'danger');
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://api.youmu.ltd/modify/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-API-Key': apiKey
+            },
+            body: new URLSearchParams({ string: newContent })
+        });
+
+        if (response.ok) {
+            showNotification('插件修改成功', 'success');
+            
+            // 优化后的关闭逻辑
+            const modifyModalEl = document.getElementById('modifyAddonModal');
+            const modifyModal = bootstrap.Modal.getInstance(modifyModalEl);
+            
+            // 分步骤关闭和清理
+            if (modifyModal) {
+                // 强制清理阶段
+                const existingModals = document.querySelectorAll('.modal.show');
+                const currentBackdrop = document.querySelector('.modal-backdrop');
+                
+                // 1. 先移除当前模态框
+                modifyModal.hide();
+                modifyModal.dispose();
+                modifyModalEl.remove();
+                
+                // 2. 清理残留背景和样式
+                if (currentBackdrop) {
+                    currentBackdrop.remove();
+                    document.body.classList.remove('modal-open');
+                    document.body.style.paddingRight = '';
+                }
+
+                // 3. 恢复滚动条（兼容多层模态框）
+                const remainingModals = document.querySelectorAll('.modal.show');
+                if (remainingModals.length === 0) {
+                    // 如果没有其他模态框，强制恢复滚动
+                    document.body.style.overflow = 'auto';
+                } else {
+                    // 如果还有其他模态框，重新应用Bootstrap滚动控制
+                    document.body.style.overflow = 'hidden';
+                    document.body.style.paddingRight = '17px'; // 滚动条宽度补偿
+                }
+            }
+
+            
+            // 刷新数据
+            allAddonsCache = null;
+            await applyCurrentFilter();
+        } else {
+            showNotification('插件修改失败', 'danger');
+        }
+    } catch (error) {
+        console.error('修改失败:', error);
+        showNotification('修改失败，请重试', 'danger');
+    }
+});
 
 // 显示通知
 function showNotification(message, type = 'info') {

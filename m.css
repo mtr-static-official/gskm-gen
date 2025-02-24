@@ -437,3 +437,22 @@ margin: 0 auto;
         }
     }
 }
+
+/* 修改模态框优化 */
+#modifyAddonModal .modal-dialog {
+    max-width: 800px;
+}
+
+#modifyAddonModal textarea {
+    font-family: monospace;
+    min-height: 300px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+#modifyAddonModal .form-label {
+    font-weight: 500;
+    color: #ff4d4d;
+}

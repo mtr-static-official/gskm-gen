@@ -60,6 +60,30 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modifyAddonModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改插件配置</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">插件 JSON 内容</label>
+                        <textarea class="form-control" id="modifyJsonInput" rows="10"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveModifiedAddon">
+                        <i class="fas fa-save"></i> 保存修改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
     <div class="container py-4">
         <h1 class="mb-4 text-center text-gradient">插件市场</h1>
         
